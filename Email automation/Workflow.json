@@ -1,0 +1,348 @@
+{
+  "name": "gmail2",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -352,
+        -48
+      ],
+      "id": "63ab9e18-e872-45be-9ac4-6bc1f45edc41",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1LvufRtZ7s_MvBMO3DgCsCuGZRe43mVFVVa_ApGsoSpc",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1LvufRtZ7s_MvBMO3DgCsCuGZRe43mVFVVa_ApGsoSpc/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -160,
+        -48
+      ],
+      "id": "8df66b79-ad2e-44af-9493-62ca143f7566",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "V03GTLwuqfrcmKC4",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "Your task is to personalize an email. Take the input- a prospective LinkedIn profile, and create 5 templates for different sections of the email- subject line, icebreaker, pitch, cto and a PS field. \nSubject line- A question from a fellow [Their Industry/Role, e.g., engineer, marketer]\nIcebreaker- I just finished reading your post on [Topic] and I loved your take on [Specific Point]. The part where you mentioned [Quote/Idea from their content] really resonated with me because [Explain why it mattered to you].\nPitch- I specialize in helping teams like yours [Achieve a specific, relatable goal, e.g., streamline their software development process, build better customer relationships, create more engaging content].\ncto- I put together a quick, one-page breakdown of a few ideas related to [Their Pain Point]. Would you be interested in me sending it over?\nPS- P.S. I recently helped a company in a similar space, [Company Name], achieve [Quantifiable Result]. I thought it might be relevant."
+            },
+            {
+              "content": "=name:  {{ $json.Name }}\nfirstname: {{ $json.FirstName }}\nrole: {{ $json.Role }}\ncompany: {{ $json.Company }}\nsnippet: {{ $json.Snippet }}\nurl: {{ $json['LinkedIn Url'] }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        48,
+        -48
+      ],
+      "id": "745849aa-40f9-44eb-a0d4-788038804c4c",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "G8FPVUgNcltdMWZ0",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1LvufRtZ7s_MvBMO3DgCsCuGZRe43mVFVVa_ApGsoSpc",
+          "mode": "list",
+          "cachedResultName": "Untitled spreadsheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1LvufRtZ7s_MvBMO3DgCsCuGZRe43mVFVVa_ApGsoSpc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1LvufRtZ7s_MvBMO3DgCsCuGZRe43mVFVVa_ApGsoSpc/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $('Get row(s) in sheet').item.json.Name }}",
+            "Role": "={{ $('Get row(s) in sheet').item.json.Role }}",
+            "Connections": "={{ $('Get row(s) in sheet').item.json.Connections }}",
+            "Company": "={{ $('Get row(s) in sheet').item.json.Company }}",
+            "LinkedIn Url": "={{ $('Get row(s) in sheet').item.json['LinkedIn Url'] }}",
+            "Snippet": "={{ $('Get row(s) in sheet').item.json.Snippet }}",
+            "ScrappedAt": "={{ $('Get row(s) in sheet').item.json.ScrappedAt }}",
+            "Subject": "={{ $json.message.content.subject_line }}",
+            "Icebreaker": "={{ $json.message.content.icebreaker }}",
+            "Pitch": "={{ $json.message.content.pitch }}",
+            "CTO": "={{ $json.message.content.cto }}",
+            "PS": "={{ $json.message.content.ps }}"
+          },
+          "matchingColumns": [
+            "Name"
+          ],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Role",
+              "displayName": "Role",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Connections",
+              "displayName": "Connections",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "LinkedIn Url",
+              "displayName": "LinkedIn Url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Snippet",
+              "displayName": "Snippet",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ScrappedAt",
+              "displayName": "ScrappedAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Subject",
+              "displayName": "Subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Icebreaker",
+              "displayName": "Icebreaker",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Pitch",
+              "displayName": "Pitch",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CTO",
+              "displayName": "CTO",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "PS",
+              "displayName": "PS",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        400,
+        -48
+      ],
+      "id": "758356d1-8002-474d-baea-2f594ae8e28c",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "V03GTLwuqfrcmKC4",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "={{ $json.Subject }}",
+        "message": "=Hi {{ $('Get row(s) in sheet').item.json.FirstName }}!\n\n{{ $json.Icebreaker }}\n\n{{ $json.Pitch }}\n\n{{ $json.CTO }}\n\n{{ $json.PS }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        608,
+        -48
+      ],
+      "id": "0d755a03-816c-4530-9483-ed4b8357b8b3",
+      "name": "Create a draft",
+      "webhookId": "e6c77a0c-8b21-4318-9b3a-189c77fa2e87",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Q7GDUOmKUSPga8Ny",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Create a draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "pinData": {},
+  "triggerCount": 0,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}
