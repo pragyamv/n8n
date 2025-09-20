@@ -44,17 +44,34 @@ By combining **retrieval-augmented generation (RAG)** with workflow automation, 
 
 ```mermaid
 flowchart TD
-    A[Google Drive Folder] -->|New Document| B[Ingestion Workflow]
-    B --> C[Text Splitter & Embeddings]
-    C --> D[Pinecone Vector Database]
-
-    E[User Chat Query] --> F[AI Agent]
+    A[📁 Google Drive Folder<br/>Document Storage] -->|New Document| B[🔄 Ingestion Workflow<br/>Process new files]
+    
+    B --> C[⚡ Text Splitter & Embeddings<br/>• Chunk text<br/>• Generate vectors]
+    
+    C --> D[🗃️ Pinecone Vector Database<br/>Searchable embeddings]
+    
+    E[💬 User Chat Query<br/>Natural language input] --> F[🤖 AI Agent<br/>Query processor]
+    
     F --> D
     D --> F
-    F --> G[Chat Response]
-
-    H[Incoming Email] --> I[Classifier]
+    F --> G[💡 Chat Response<br/>AI-generated answer]
+    
+    H[📧 Incoming Email<br/>New messages] --> I[🔍 Classifier<br/>Email categorization]
+    
     I -->|Customer Support| F
-    F --> J[Automated Reply Email]
-    I -->|Other| K[Ignore / Route Elsewhere]
+    F --> J[📤 Automated Reply Email<br/>AI response sent]
+    
+    I -->|Other| K[🚫 Ignore / Route Elsewhere<br/>Non-support handling]
+    
+    style A fill:#4285f4,color:#fff
+    style B fill:#34a853,color:#fff
+    style C fill:#ea4335,color:#fff
+    style D fill:#9c27b0,color:#fff
+    style E fill:#ff6d01,color:#fff
+    style F fill:#f44336,color:#fff
+    style G fill:#2196f3,color:#fff
+    style H fill:#607d8b,color:#fff
+    style I fill:#795548,color:#fff
+    style J fill:#4caf50,color:#fff
+    style K fill:#9e9e9e,color:#fff
 
