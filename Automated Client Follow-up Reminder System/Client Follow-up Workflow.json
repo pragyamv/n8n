@@ -1,0 +1,149 @@
+{
+  "name": "Nutrition Client Reminders",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1misk035SmxGvdQuwMnnwTG1IdBfpBuqGJlXWznPa7oA",
+          "mode": "list",
+          "cachedResultName": "Clients",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1misk035SmxGvdQuwMnnwTG1IdBfpBuqGJlXWznPa7oA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1misk035SmxGvdQuwMnnwTG1IdBfpBuqGJlXWznPa7oA/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        -496,
+        -112
+      ],
+      "id": "13e18076-9a28-42d9-8e0b-0585b366329e",
+      "name": "Google Sheets Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "7wsDOVrB27cnouhT",
+          "name": "Google Sheets Trigger account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse DD/MM/YYYY string back to Date object, but handle raw epoch data too\nfunction parseDate(dateValue) {\n  // If it's already a formatted string (DD/MM/YYYY)\n  if (typeof dateValue === 'string' && dateValue.includes('/')) {\n    const parts = dateValue.split('/');\n    const day = parseInt(parts[0]);\n    const month = parseInt(parts[1]) - 1; // Month is 0-indexed\n    const year = parseInt(parts[2]);\n    return new Date(year, month, day);\n  }\n  \n  // If it's still epoch format from Google Sheets\n  if (typeof dateValue === 'number') {\n    return new Date(Math.round((dateValue - 25569) * 86400 * 1000));\n  }\n  \n  // Fallback\n  return new Date(dateValue);\n}\n\nconst startDate = parseDate($json[\"Start Date\"]);\nconst clientName = $json[\"Client Name\"];\nconst allReminders = [];\n\n// Check if client name contains \"(To start)\"\nconst isToStartClient = clientName.includes(\"(To start)\");\nconst cleanClientName = clientName.replace(\"(To start)\", \"\").trim();\n\n// Add start date reminder for \"(To start)\" clients\nif (isToStartClient) {\n  allReminders.push({\n    clientName: cleanClientName,\n    startDate: startDate.toISOString().split('T')[0],\n    reminderDate: startDate.toISOString().split('T')[0],\n    daysFromStart: 0,\n    reminderType: \"start\",\n    message: `${cleanClientName} should start today`\n  });\n}\n\n// Generate follow-up reminders every 5 days for 8 occurrences\nfor (let i = 1; i <= 8; i++) {\n  const reminderDate = new Date(startDate);\n  reminderDate.setDate(startDate.getDate() + (i * 5));\n  \n  allReminders.push({\n    clientName: cleanClientName,\n    startDate: startDate.toISOString().split('T')[0],\n    reminderDate: reminderDate.toISOString().split('T')[0],\n    daysFromStart: i * 5,\n    reminderType: \"followup\",\n    message: `Follow-up with ${cleanClientName}, started on ${startDate.toLocaleDateString('en-GB')}`\n  });\n}\n\nreturn allReminders;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -272,
+        -112
+      ],
+      "id": "c65634e9-983a-4799-b734-27d19fb91b6c",
+      "name": "Date conversion, reminders"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "reminderDate",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -64,
+        -112
+      ],
+      "id": "dc26c854-a38b-4c32-9fa9-90ab2b7d0498",
+      "name": "Split reminders"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "sandhyavik@gmail.com",
+          "mode": "list",
+          "cachedResultName": "sandhya vikram"
+        },
+        "start": "={{ $json.reminderDate }}T06:00:00",
+        "end": "={{ $json.reminderDate }}T06:15:00",
+        "additionalFields": {
+          "description": "={{ $json.message }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        144,
+        -112
+      ],
+      "id": "9a07c73d-7b0f-4ad7-9d77-6cfe109fb03e",
+      "name": "Create an event",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "SKZlvIBU8fcMK4ZK",
+          "name": "Google Calendar account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "Date conversion, reminders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date conversion, reminders": {
+      "main": [
+        [
+          {
+            "node": "Split reminders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split reminders": {
+      "main": [
+        [
+          {
+            "node": "Create an event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8d586ff3-52cd-418d-9c4a-adc8d0cae695",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "74f0fba0bc436da2bbb58cce985368fb8f3173e9ea0a1084a101755e12ded604"
+  },
+  "id": "hof0t6DglqHg2C5I",
+  "tags": []
+}
