@@ -59,9 +59,26 @@ Output is a ready-to-send draft per lead.
 
 ```mermaid
 flowchart TD
-    A[Google Sheet with Leads] --> B[Fetch Lead Rows]
-    B --> C[AI Model Generates Email Templates]
-    C --> D[Update Sheet with Generated Content]
-    D --> E[Gmail Create Drafts]
-    E --> F[Personalized Email Ready for Review]
-
+    A[📊 Google Sheets<br/>Lead Database<br/>• Names & Roles<br/>• Company Info<br/>• LinkedIn URLs] --> B[📡 Fetch Lead Data<br/>Get spreadsheet rows]
+    
+    B --> C[🤖 AI Content Generation<br/>OpenAI creates:<br/>• Subject Lines<br/>• Icebreakers<br/>• Pitch Content<br/>• Call-to-Action<br/>• P.S. Messages]
+    
+    C --> D[📝 Update Spreadsheet<br/>Write back generated<br/>content to same rows]
+    
+    D --> E[✉️ Gmail Draft Creation<br/>Pre-filled personalized<br/>emails ready for review]
+    
+    E --> F[🎯 Ready to Send<br/>Personalized outreach<br/>drafts awaiting approval]
+    
+    B --> G{Multiple<br/>Leads?}
+    G -->|Yes| H[🔄 Process Each Lead<br/>Individual AI generation]
+    G -->|No| C
+    H --> C
+    
+    style A fill:#4285f4,color:#fff
+    style B fill:#34a853,color:#fff
+    style C fill:#ea4335,color:#fff
+    style D fill:#fbbc04,color:#000
+    style E fill:#9c27b0,color:#fff
+    style F fill:#ff6d01,color:#fff
+    style G fill:#607d8b,color:#fff
+    style H fill:#795548,color:#fff
